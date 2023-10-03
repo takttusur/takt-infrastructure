@@ -1,0 +1,64 @@
+---
+- name: Ensure nginx docker image is downloaded 
+  community.docker.docker_image:
+    name: "nginx:1.25.2"
+    source: pull
+    state: present
+    
+- name: Stop nginx
+  community.docker.docker_container:
+    name: "takt-host"
+    state: absent
+    
+- name: Stop and remove takt_public container
+  community.docker.docker_container:
+    name: "takt-public"
+    state: absent
+    
+- name: Ensure directories
+  file:
+    path: /var/lib/takt_host
+    state: directory
+    
+- name: Copy nginx config
+  template:
+    src: takt_nginx.conf.j2
+    dest: /var/lib/takt_host/takt_nginx.conf
+
+- name: Remove takt_public image
+  community.docker.docker_image:
+    name: "ghcr.io/takttusur/takt-public:latest"
+    source: pull
+    state: absent
+      
+- name: Pull new takt_public
+  community.docker.docker_image:
+    name: "ghcr.io/takttusur/takt-public:latest"
+    source: pull
+    state: present
+    
+- name: Create takt network and connect containers
+  community.docker.docker_network:
+    name: takt-network
+    state: present
+          
+- name: Start takt-public
+  community.docker.docker_container:
+    name: "takt-public"
+    state: started
+    image: "ghcr.io/takttusur/takt-public:latest"
+    networks:
+      - name: takt-network
+        
+- name: Start nginx
+  community.docker.docker_container:
+    name: "takt-host"
+    state: started
+    image: "nginx:1.25.2"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/lib/takt_host/takt_nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - name: takt-network
