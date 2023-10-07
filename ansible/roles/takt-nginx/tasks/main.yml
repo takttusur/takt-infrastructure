@@ -1,18 +1,18 @@
 ---
 - name: Ensure nginx docker image is downloaded 
   community.docker.docker_image:
-    name: "nginx:1.25.2"
+    name: "nginx:{{ nginx_version }}"
     source: pull
     state: present
     
 - name: Stop nginx
   community.docker.docker_container:
-    name: "takt-host"
+    name: "{{ containers_nginx }}"
     state: absent
     
-- name: Stop and remove takt_public container
+- name: Stop and remove takt-public container
   community.docker.docker_container:
-    name: "takt-public"
+    name: "{{ containers_takt_public }}"
     state: absent
     
 - name: Ensure directories
@@ -25,15 +25,15 @@
     src: takt_nginx.conf.j2
     dest: /var/lib/takt_host/takt_nginx.conf
 
-- name: Remove takt_public image
+- name: Remove takt-public image
   community.docker.docker_image:
-    name: "ghcr.io/takttusur/takt-public:latest"
+    name: "{{ takt_public_image }}"
     source: pull
     state: absent
       
 - name: Pull new takt_public
   community.docker.docker_image:
-    name: "ghcr.io/takttusur/takt-public:latest"
+    name: "{{ takt_public_image }}"
     source: pull
     state: present
     
@@ -44,17 +44,19 @@
           
 - name: Start takt-public
   community.docker.docker_container:
-    name: "takt-public"
+    name: "{{ containers_takt_public }}"
     state: started
-    image: "ghcr.io/takttusur/takt-public:latest"
+    image: "{{ takt_public_image }}"
+    restart_policy: "unless-stopped"
     networks:
       - name: takt-network
         
 - name: Start nginx
   community.docker.docker_container:
-    name: "takt-host"
+    name: "{{ containers_nginx }}"
     state: started
-    image: "nginx:1.25.2"
+    image: "nginx:{{ nginx_version }}"
+    restart_policy: "unless-stopped"
     ports:
       - "80:80"
       - "443:443"

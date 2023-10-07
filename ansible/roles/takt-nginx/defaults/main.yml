@@ -1,2 +1,5 @@
 ---
-# defaults file for takt-nginx
+nginx_version: "1.25.2"
+
+containers_nginx: "takt-nginx"
+containers_takt_public: "takt-public"

@@ -1,2 +1,3 @@
 ---
-# vars file for takt-nginx
+takt_host_url: "local.takt.tusur.ru"
+takt_public_image: "ghcr.io/takttusur/takt-public:latest"
