@@ -1,0 +1,14 @@
+---
+# tasks file for system_setting
+
+- name: pre_install_software
+  import_tasks: pre_install_software.yml
+  become: true
+
+- name: install docker
+  import_tasks: docker_install.yml
+  become: true
+
+- name: portainer install
+  import_tasks: docker_portainer.yml
+  become: true

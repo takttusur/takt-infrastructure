@@ -1,4 +1,0 @@
-- hosts: servers
-  become: true
-  roles:
-    - role: takt-nginx

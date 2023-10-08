@@ -1,0 +1,6 @@
+---
+- name: Takt site and NGINX
+- hosts: servers
+  become: true
+  roles:
+    - role: takt-nginx

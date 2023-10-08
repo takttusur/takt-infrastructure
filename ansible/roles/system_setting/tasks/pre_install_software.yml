@@ -1,0 +1,12 @@
+---
+- name: Installing additional packages 
+  ansible.builtin.apt:
+    name:
+      - mc
+      - net-tools
+      - htop
+      - curl
+    state: present
+    update-cache: true
+    cache_valid_time: 86400
+  become: true
