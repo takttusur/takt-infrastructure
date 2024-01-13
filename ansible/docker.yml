@@ -1,4 +1,6 @@
-- hosts: servers
+---
+- name: Takt aplication
+  hosts: servers
   become: true
   roles:
     - role: geerlingguy.docker

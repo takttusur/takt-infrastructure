@@ -1,0 +1,40 @@
+---
+- name: Remove takt-public image
+  community.docker.docker_image:
+    name: "{{ takt_public_image }}"
+    source: pull
+    state: absent
+
+- name: Pull new takt_public
+  community.docker.docker_image:
+    name: "{{ takt_public_image }}"
+    source: pull
+    state: present
+
+- name: Create takt network and connect containers
+  community.docker.docker_network:
+    name: takt-network
+    state: present
+
+- name: Start takt-public
+  community.docker.docker_container:
+    name: "{{ containers_takt_public }}"
+    state: started
+    image: "{{ takt_public_image }}"
+    restart_policy: "unless-stopped"
+    networks:
+      - name: takt-network
+
+- name: Start nginx
+  community.docker.docker_container:
+    name: "{{ containers_nginx }}"
+    state: started
+    image: "nginx:{{ nginx_version }}"
+    restart_policy: "unless-stopped"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/lib/takt_host/takt_nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - name: takt-network

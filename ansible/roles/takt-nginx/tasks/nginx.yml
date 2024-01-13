@@ -1,0 +1,28 @@
+---
+- name: Ensure nginx docker image is downloaded
+  community.docker.docker_image:
+    name: "nginx:{{ nginx_version }}"
+    source: pull
+    state: present
+
+- name: Stop nginx
+  community.docker.docker_container:
+    name: "{{ containers_nginx }}"
+    state: absent
+
+- name: Stop and remove takt-public container
+  community.docker.docker_container:
+    name: "{{ containers_takt_public }}"
+    state: absent
+
+- name: Ensure directories
+  ansible.builtin.file:
+    path: /var/lib/takt_host
+    state: directory
+    mode: '0755'
+
+- name: Copy nginx config
+  ansible.builtin.template:
+    src: takt_nginx.conf.j2
+    dest: /var/lib/takt_host/takt_nginx.conf
+    mode: '0644'
