@@ -1,4 +1,7 @@
 ---
+- name: Prepare Self-Signed SSL cert
+  ansible.builtin.include_tasks: selfsignedssl.yml
+
 - name: Install nginx
   ansible.builtin.include_tasks: nginx.yml
 

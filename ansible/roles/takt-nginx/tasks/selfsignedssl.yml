@@ -1,0 +1,41 @@
+- name: Ensure OpenSSL is installed
+  apt:
+    name: openssl
+    state: present
+
+- name: Check if cert exists
+  stat:
+    path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/fullchain.pem"
+  register: sslcertexists
+  
+- name: Create directory for LetsEncrypt certs
+  file:
+    path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}"
+    state: directory
+  when: not sslcertexists.stat.exists
+  
+- name: Create directory for LetsEncrypt certs
+  file:
+    path: "/var/lib/takt_host/letsencrypt/archive/{{ takt_host_url }}"
+    state: directory
+  when: not sslcertexists.stat.exists
+    
+- name: Generate an OpenSSL private key, defaults to RSA, 4096 bits
+  openssl_privatekey:
+    path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/privkey.pem"
+  when: not sslcertexists.stat.exists
+
+- name: Generate an OpenSSl certificate signing request
+  openssl_csr:
+    path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/request.csr"
+    privatekey_path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/privkey.pem"
+    common_name: "{{ takt_host_url }}"
+  when: not sslcertexists.stat.exists
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/fullchain.pem"
+    privatekey_path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/privkey.pem"
+    csr_path: "/var/lib/takt_host/letsencrypt/live/{{ takt_host_url }}/request.csr"
+    provider: selfsigned
+  when: not sslcertexists.stat.exists

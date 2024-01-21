@@ -1,4 +1,4 @@
----
+---    
 - name: Ensure nginx docker image is downloaded
   community.docker.docker_image:
     name: "nginx:{{ nginx_version }}"
@@ -15,9 +15,21 @@
     name: "{{ containers_takt_public }}"
     state: absent
 
-- name: Ensure directories
+- name: Ensure directories for takt_host
   ansible.builtin.file:
     path: /var/lib/takt_host
+    state: directory
+    mode: '0755'
+    
+- name: Ensure directories for certbot
+  ansible.builtin.file:
+    path: /var/lib/takt_host/certbot
+    state: directory
+    mode: '0755'
+
+- name: Ensure directories for certbot
+  ansible.builtin.file:
+    path: /var/lib/takt_host/letsencrypt
     state: directory
     mode: '0755'
 
@@ -26,3 +38,9 @@
     src: takt_nginx.conf.j2
     dest: /var/lib/takt_host/takt_nginx.conf
     mode: '0644'
+    
+- name: Ensure certbot docker image is downloaded
+  community.docker.docker_image:
+    name: "certbot/certbot:latest"
+    source: pull
+    state: present

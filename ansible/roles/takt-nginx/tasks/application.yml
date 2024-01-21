@@ -35,6 +35,20 @@
       - "80:80"
       - "443:443"
     volumes:
-      - /var/lib/takt_host/takt_nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - "/var/lib/takt_host/takt_nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "/var/lib/takt_host/certbot:/var/www/certbot:ro"
+      - "/var/lib/takt_host/letsencrypt:/etc/letsencrypt:ro"
+    networks:
+      - name: takt-network
+
+- name: Start certbot
+  community.docker.docker_container:
+    name: "certbot"
+    state: started
+    image: "certbot/certbot:latest"
+    command: "certonly --webroot --webroot-path /var/www/certbot/ --email andreygolubkow@gmail.com --agree-tos --no-eff-email -d {{ takt_host_url }}"
+    volumes:
+      - "/var/lib/takt_host/certbot:/var/www/certbot/:rw"
+      - "/var/lib/takt_host/letsencrypt:/etc/letsencrypt/:rw"
     networks:
       - name: takt-network
