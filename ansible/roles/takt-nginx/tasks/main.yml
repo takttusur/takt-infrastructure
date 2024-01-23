@@ -1,6 +1,20 @@
 ---
-- name: Install nginx
-  ansible.builtin.include_tasks: nginx.yml
+- name: Remove packages/containers from previous version
+  ansible.builtin.include_tasks: migration.yml
+  
+- name: Make project directory
+  ansible.builtin.file:
+    path: "/var/lib/{{ project_name }}"
+    state: directory
+    mode: '0755'
+    
+- name: Create project network
+  community.docker.docker_network:
+    name: "{{ network_application }}"
+    state: present
+  
+- name: Install Traefik
+  ansible.builtin.include_tasks: traefik-task.yml
 
 - name: Install application
   ansible.builtin.include_tasks: application.yml

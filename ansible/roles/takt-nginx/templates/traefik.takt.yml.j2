@@ -1,0 +1,21 @@
+http:
+  routers:
+    http-to-takt:
+      rule: "Host(`{{ takt_host_url }}`)"
+      service: takt-public
+      entrypoints: web
+    https-to-takt:
+      rule: "Host(`{{ takt_host_url }}`)"
+      service: takt-public    
+      entrypoints: websecure
+      tls:
+        certResolver: leresolver
+        domains:
+          - main: "{{ takt_host_url }}"
+
+  services:
+    takt-public:
+      loadBalancer:
+        servers:
+        - url: http://{{ containers_takt_public }}
+      

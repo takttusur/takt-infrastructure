@@ -1,0 +1,50 @@
+---
+- name: Pull Traefik
+  community.docker.docker_image:
+    name: "traefik:{{ traefik_version }}"
+    source: pull
+    state: present
+    
+- name: Ensure directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ project_directory_traefik }}"
+    - "{{ project_directory_traefik }}/acme"
+    - "{{ project_directory_traefik }}/conf"
+
+- name: Copy Traefik config
+  ansible.builtin.template:
+    src: traefik.takt.yml.j2
+    dest: "{{ project_directory_traefik }}/conf/traefik.takt.yml"
+    mode: '0644' 
+    
+- name: Start Traefik
+  community.docker.docker_container:
+    name: "{{ containers_traefik}}"
+    state: started
+    image: "traefik:{{ traefik_version }}"
+    restart_policy: "unless-stopped"
+    command:
+      - "--api.insecure=true"
+      - "--providers.file.directory=/etc/traefik/conf"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesResolvers.leresolver.acme.email={{ letsencrypt_email }}"
+      - "--certificatesResolvers.leresolver.acme.caServer={{ letsencrypt_server }}"
+      - "--certificatesResolvers.leresolver.acme.storage=/etc/traefik/acme/acme.json"
+      - "--certificatesresolvers.leresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.leresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - "{{ project_directory_traefik }}/conf:/etc/traefik/conf"
+      - "{{ project_directory_traefik }}/acme:/etc/traefik/acme"
+    networks:
+      - name: "{{ network_application }}"
