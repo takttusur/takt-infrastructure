@@ -28,7 +28,6 @@
     image: "traefik:{{ traefik_version }}"
     restart_policy: "unless-stopped"
     command:
-      - "--api.insecure=true"
       - "--providers.file.directory=/etc/traefik/conf"
       - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
