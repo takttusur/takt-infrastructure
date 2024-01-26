@@ -4,7 +4,7 @@
     name: "traefik:{{ traefik_version }}"
     source: pull
     state: present
-    
+
 - name: Ensure directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -19,11 +19,11 @@
   ansible.builtin.template:
     src: traefik.takt.yml.j2
     dest: "{{ project_directory_traefik }}/conf/traefik.takt.yml"
-    mode: '0644' 
-    
+    mode: '0644'
+
 - name: Start Traefik
   community.docker.docker_container:
-    name: "{{ containers_traefik}}"
+    name: "{{ containers_traefik }}"
     state: started
     image: "traefik:{{ traefik_version }}"
     restart_policy: "unless-stopped"

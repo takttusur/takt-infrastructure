@@ -9,7 +9,7 @@
     name: "{{ takt_public_image }}"
     source: pull
     state: absent
-    
+
 - name: Pull new takt_public
   community.docker.docker_image:
     name: "{{ takt_public_image }}"

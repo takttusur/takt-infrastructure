@@ -3,25 +3,25 @@
   community.docker.docker_container:
     name: "{{ containers_nginx }}"
     state: absent
-    
+
 - name: Stop certbot container
   community.docker.docker_container:
     name: certbon_container
     state: absent
     image: certbot/certbot:v2.8.0
-    
+
 - name: Remove certbot image
   community.docker.docker_image:
     name: "certbot/certbot:v2.8.0"
     source: pull
     state: absent
-    
+
 - name: Remove nginx image
   community.docker.docker_image:
     name: "nginx:{{ nginx_version }}"
     source: pull
     state: absent
-    
+
 - name: Remove old nginx config
   ansible.builtin.file:
     path: "/var/lib/{{ project_name }}/takt_nginx.conf"
