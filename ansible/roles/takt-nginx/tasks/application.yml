@@ -1,4 +1,9 @@
 ---
+- name: Stop and remove takt-public container
+  community.docker.docker_container:
+    name: "{{ containers_takt_public }}"
+    state: absent
+
 - name: Remove takt-public image
   community.docker.docker_image:
     name: "{{ takt_public_image }}"
@@ -9,11 +14,6 @@
   community.docker.docker_image:
     name: "{{ takt_public_image }}"
     source: pull
-    state: present
-
-- name: Create takt network and connect containers
-  community.docker.docker_network:
-    name: "{{ network_application }}"
     state: present
 
 - name: Start takt-public

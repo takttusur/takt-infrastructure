@@ -1,5 +1,5 @@
 ---
-#takt_host_url: "local.takt.tusur.ru"
+# takt_host_url: "local.takt.tusur.ru"
 takt_host_url: "takt.tusur.ru"
 takt_public_image: "ghcr.io/takttusur/takt-public:latest"
-network_application: "takt-network"
+letsencrypt_email: ""
